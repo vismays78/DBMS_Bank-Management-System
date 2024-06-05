@@ -1,0 +1,176 @@
+create database hdfc_bank; 
+use hdfc_bank; 
+create table branch( 
+bid int primary key, 
+bname varchar(255), 
+badd varchar(255) 
+); 
+
+create table customer( 
+cid int primary key, 
+cname varchar(30), 
+cphone int, 
+cadd varchar(255) 
+); 
+
+create table account( 
+accno int primary key, 
+acctype varchar(50), 
+accbalance int, 
+bid int references branch 
+); 
+
+create table loan( 
+lid int primary key, 
+ltype varchar(50), 
+lamt int, 
+bid int references branch 
+);
+ 
+create table availed ( 
+lid int references loan, 
+cid int references customer 
+);
+ 
+create table hold( 
+accno int references account, 
+cid int references customer 
+);
+ 
+insert into branch values(123,'andheri','mumbai'); 
+insert into branch values(234,'ghatkopar','mumbai'); 
+insert into branch values(345,'sarojini nagar','delhi'); 
+insert into branch values(456,'bhayander','thane'); 
+insert into branch values(567,'badlapur','thane'); 
+insert into branch values(678,'versova','mumbai'); 
+insert into branch values(789,'byculla','mumbai'); 
+insert into branch values(891,'dadar','mumbai'); 
+
+insert into customer values(1,'vismay','756329','versova'); 
+insert into customer values(2,'raghav','362836','andheri'); 
+insert into customer values(3,'darshil','927537','bhiwandi'); 
+insert into customer values(4,'ritesh','192736','byculla'); 
+insert into customer values(5,'shanay','393726','surat'); 
+
+insert into account values(111,'savings',10000,123); 
+insert into account values(222,'savings',20000,456); 
+insert into account values(333,'current',40000,345); 
+insert into account values(444,'current',5000,123); 
+insert into account values(555,'current',50000,234); 
+insert into account values(666,'current',70000,567); 
+insert into account values(777,'savings',90000,891); 
+insert into account values(888,'current',100000,789); 
+
+insert into loan values(01,'home loan',100000,123); 
+insert into loan values(02,'bussiness loan',200000,234); 
+insert into loan values(03,'car loan',300000,345); 
+insert into loan values(04,'gold loan',500000,678); 
+insert into loan values(05,'education loan',400000,891);
+ 
+insert into availed values(01,1); 
+insert into availed values(03,3); 
+insert into availed values(04,4); 
+insert into availed values(05,5); 
+
+insert into hold values(111,1); 
+insert into hold values(222,2); 
+insert into hold values(333,3); 
+insert into hold values(444,4); 
+insert into hold values(555,5); 
+insert into hold values(888,1);
+ 
+select * from customer; 
+
+select accno from account;
+ 
+select * from account 
+where cid=5;
+ 
+update customer 
+set cname='rehaan' 
+where cid=4; 
+
+select * from customer;
+ 
+delete from customer 
+where cid=2;
+ 
+select * from customer;
+ 
+alter table account 
+add acc_opening_date varchar(10);
+ 
+select * from account;
+ 
+update account 
+set acc_opening_date = '2022-10-10' 
+where accno = 777;
+ 
+select * from account;
+ 
+alter table account drop column acc_opening_date;
+ 
+select * from account;
+ 
+desc loan;
+ 
+select a.accno,c.cname from account a, customer c,hold h 
+where a.accno=h.accno and h.cid=c.cid; 
+
+select ltype, lamt from loan where lamt>300000;
+ 
+select cname from customer where cname like 'r%';
+ 
+select max(accbalance) from account;
+ 
+select c.cname from customer c, account a, hold h 
+where a.accno=h.accno and h.cid=c.cid and accbalance=(select max(accbalance) from 
+account);
+ 
+select * from availed inner join hold using (cid);
+ 
+select * from availed right outer join hold using (cid);
+ 
+select * from customer left outer join hold using (cid);
+ 
+select * from customer full join hold using (cid);
+ 
+create view XYZ AS 
+select bid,bname 
+from branch;
+ 
+select * from XYZ;
+ 
+create view abc as 
+select c.cid,c.cname,a.acctype 
+from customer c, account a, hold h 
+where a.accno=h.accno and h.cid=c.cid;
+ 
+select * from abc;
+ 
+update abc 
+set cname='vinayak' 
+where cid=1;
+ 
+select * from abc;
+ 
+insert into abc values (6,'krish','savings');
+ 
+select * from abc;
+ 
+delete from abc 
+where cid=5;
+ 
+select * from abc;
+ 
+alter table account 
+add transaction int;
+ 
+create trigger blc before update on account for each row set new.accbalance= 
+new.accbalance + new.transaction;
+ 
+update account 
+set transaction=1000 
+where accno=111;
+ 
+select * from account; 
